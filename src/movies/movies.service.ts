@@ -4,14 +4,13 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 
 @Injectable()
 export class MoviesService {
-
   private movies = [
-    {id : 1, title: 'Boboiboy Galaxy', genre: 'Action', duration: '110 menit'},
-    {id: 2, title: 'Sore', genre: 'Romance', duration: '115 menit'},
+    { id: 1, title: 'Venom: The Last Dance', genre: 'Action', duration: '110 min' },
+    { id: 2, title: 'Inside Out 2', genre: 'Animation', duration: '95 min' },
   ];
 
   create(createMovieDto: CreateMovieDto) {
-    const newMovie: any = { id: Date.now(), ...createMovieDto };
+    const newMovie = { id: Date.now(), ...createMovieDto };
     this.movies.push(newMovie);
     return newMovie;
   }
