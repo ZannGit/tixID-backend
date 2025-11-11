@@ -1,0 +1,160 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id          BigInt     @id @default(autoincrement())
+  name        String
+  phone       String      @unique
+  email       String      @unique
+  password    String
+  role        String      @default("user")
+  isVerified  Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // relasi
+  bookings    Booking[]
+
+  @@map("users")
+}
+
+model Movies {
+  id           BigInt     @id @default(autoincrement())
+  title        String
+  sinopsis     String?
+  genre        String
+  duration     Int
+  rating       String?
+  posterUrl    String?
+  dateRelease  DateTime
+
+  // relasi
+  showtimes    Showtime[]
+
+  @@map("movies")
+}
+
+model Cinemas {
+  id        BigInt   @id @default(autoincrement())
+  name      String
+  city      String
+  address   String
+
+  studios   Studio[]
+
+  @@map("cinemas")
+}
+
+model Studio {
+  id          BigInt    @id @default(autoincrement())
+  cinemaId    BigInt
+  name        String
+  seatConfig  Json
+
+  // relasi
+  cinema      Cinemas   @relation(fields: [cinemaId], references: [id])
+  seats       Seat[]
+  showtimes   Showtime[]
+
+  @@map("studio")
+}
+
+model Seat {
+  id        BigInt   @id @default(autoincrement())
+  studioId  BigInt
+  seatCode  String
+  isActive  Boolean  @default(true)
+  isBooked  Boolean  @default(false)
+
+  studio    Studio   @relation(fields: [studioId], references: [id])
+  bookingSeats BookingSeat[]
+
+  @@unique([studioId, seatCode]) // tiap studio harus punya kode kursi unik
+  @@map("seat")
+}
+
+model Showtime {
+  id         BigInt   @id @default(autoincrement())
+  movieId    BigInt
+  studioId   BigInt
+  startTime  DateTime
+  endTime    DateTime
+  price      Int
+
+  movie      Movies   @relation(fields: [movieId], references: [id])
+  studio     Studio   @relation(fields: [studioId], references: [id])
+  bookings   Booking[]
+
+  @@map("showtime")
+}
+
+model Booking {
+  id          BigInt     @id @default(autoincrement())
+  userId      BigInt
+  showtimeId  BigInt
+  status      String      @default("pending")
+  totalPrice  Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user        Users       @relation(fields: [userId], references: [id])
+  showtime    Showtime    @relation(fields: [showtimeId], references: [id])
+  bookingSeats BookingSeat[]
+  payment     Payment?
+  eTicket     ETicket?
+
+  @@map("booking")
+}
+
+model BookingSeat {
+  bookingId  BigInt
+  seatId     BigInt
+  price      Int
+
+  booking    Booking @relation(fields: [bookingId], references: [id])
+  seat       Seat    @relation(fields: [seatId], references: [id])
+
+  @@id([bookingId, seatId]) // composite primary key
+  @@map("bookingseat")
+}
+
+model Payment {
+  id          BigInt   @id @default(autoincrement())
+  bookingId   BigInt   @unique      // ✅ tambahkan @unique di sini
+  method      String
+  amount      String
+  status      String
+  transaction String?
+  generateQr  String?
+
+  booking     Booking  @relation(fields: [bookingId], references: [id])
+
+  @@map("payment")
+}
+
+model ETicket {
+  id          BigInt   @id @default(autoincrement())
+  bookingId   BigInt   @unique      // ✅ tambahkan @unique di sini
+  codeUnique  String   @unique
+  qrData      String?
+  issuedAt    DateTime @default(now())
+  status      String
+
+  booking     Booking  @relation(fields: [bookingId], references: [id])
+
+  @@map("eticket")
+}
+  
