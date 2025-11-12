@@ -1,5 +1,9 @@
 export class CreateMovieDto {
   title: string;
+  sinopsis: string;
   genre: string;
-  duration: string;
+  duration: number;
+  rating: string;
+  posterUrl: string;
+  dateReleased: Date;
 }
