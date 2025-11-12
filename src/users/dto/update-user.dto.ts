@@ -1,26 +1,29 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsNotEmpty, IsString, IsOptional, IsEmail } from 'class-validator';
+import { IsOptional, IsString, IsEmail, Matches } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
     @IsOptional()
     @IsString()
-    name: string;
+    name?: string;
 
     @IsOptional()
-    @IsString()
     @IsEmail()
-    email: string;
+    email?: string;
+
+    @IsOptional()
+    @Matches(/^\+?[0-9]{7,15}$/, { message: 'phone must be a valid phone number' })
+    phone?: string;
 
     @IsOptional()
     @IsString()
-    password: string;
+    password?: string;
 
     @IsOptional()
     @IsString()
-    role: string;
+    role?: string;
 
     @IsOptional()
     @IsString()
-    createdAt: string;
+    createdAt?: string;
 }

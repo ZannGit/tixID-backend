@@ -14,13 +14,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
 model Users {
-  id          BigInt     @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String
-  phone       String      @unique
-  email       String      @unique
+  phone       String?     @unique
+  email       String?     @unique
   password    String
-  role        String      @default("user")
+  role        UserRole      @default(USER)
   isVerified  Boolean     @default(false)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -32,7 +36,7 @@ model Users {
 }
 
 model Movies {
-  id           BigInt     @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   title        String
   sinopsis     String?
   genre        String
@@ -48,7 +52,7 @@ model Movies {
 }
 
 model Cinemas {
-  id        BigInt   @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   name      String
   city      String
   address   String
@@ -59,8 +63,8 @@ model Cinemas {
 }
 
 model Studio {
-  id          BigInt    @id @default(autoincrement())
-  cinemaId    BigInt
+  id          Int    @id @default(autoincrement())
+  cinemaId    Int
   name        String
   seatConfig  Json
 
@@ -73,8 +77,8 @@ model Studio {
 }
 
 model Seat {
-  id        BigInt   @id @default(autoincrement())
-  studioId  BigInt
+  id        Int   @id @default(autoincrement())
+  studioId  Int
   seatCode  String
   isActive  Boolean  @default(true)
   isBooked  Boolean  @default(false)
@@ -87,9 +91,9 @@ model Seat {
 }
 
 model Showtime {
-  id         BigInt   @id @default(autoincrement())
-  movieId    BigInt
-  studioId   BigInt
+  id         Int   @id @default(autoincrement())
+  movieId    Int
+  studioId   Int
   startTime  DateTime
   endTime    DateTime
   price      Int
@@ -102,9 +106,9 @@ model Showtime {
 }
 
 model Booking {
-  id          BigInt     @id @default(autoincrement())
-  userId      BigInt
-  showtimeId  BigInt
+  id          Int     @id @default(autoincrement())
+  userId      Int
+  showtimeId  Int
   status      String      @default("pending")
   totalPrice  Int
   createdAt   DateTime    @default(now())
@@ -120,8 +124,8 @@ model Booking {
 }
 
 model BookingSeat {
-  bookingId  BigInt
-  seatId     BigInt
+  bookingId  Int
+  seatId     Int
   price      Int
 
   booking    Booking @relation(fields: [bookingId], references: [id])
@@ -132,8 +136,8 @@ model BookingSeat {
 }
 
 model Payment {
-  id          BigInt   @id @default(autoincrement())
-  bookingId   BigInt   @unique      // ✅ tambahkan @unique di sini
+  id          Int   @id @default(autoincrement())
+  bookingId   Int   @unique      // ✅ tambahkan @unique di sini
   method      String
   amount      String
   status      String
@@ -146,8 +150,8 @@ model Payment {
 }
 
 model ETicket {
-  id          BigInt   @id @default(autoincrement())
-  bookingId   BigInt   @unique      // ✅ tambahkan @unique di sini
+  id          Int   @id @default(autoincrement())
+  bookingId   Int   @unique      // ✅ tambahkan @unique di sini
   codeUnique  String   @unique
   qrData      String?
   issuedAt    DateTime @default(now())
@@ -157,4 +161,3 @@ model ETicket {
 
   @@map("eticket")
 }
-  

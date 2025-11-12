@@ -2,7 +2,8 @@ import {
     IsEmail,
     IsNotEmpty,
     IsString,
-    IsStrongPassword,
+    IsOptional,
+    Matches,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -10,13 +11,16 @@ export class CreateUserDto {
     @IsString()
     name: string;
 
-    @IsNotEmpty()
-    @IsString()
+    @IsOptional()
     @IsEmail()
-    email: string;
+    email?: string;
+
+    @IsOptional()
+    @Matches(/^\+?[0-9]{7,15}$/, { message: 'phone must be a valid phone number' })
+    phone?: string;
 
     @IsNotEmpty()
-    @IsStrongPassword()
+    @IsString()
     password: string;
 
     @IsNotEmpty()
