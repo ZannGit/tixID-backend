@@ -1,43 +1,40 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 
 @Injectable()
 export class MoviesService {
-  private movies = [
-    { id: 1, title: 'Venom: The Last Dance', genre: 'Action', duration: '110 min' },
-    { id: 2, title: 'Inside Out 2', genre: 'Animation', duration: '95 min' },
-  ];
+  constructor(private prisma: PrismaService) {}
 
-  create(createMovieDto: CreateMovieDto) {
-    const newMovie = { id: Date.now(), ...createMovieDto };
-    this.movies.push(newMovie);
-    return newMovie;
-  }
+  create(dto: CreateMovieDto) {
+  return this.prisma.movies.create({
+    data: {
+      title: dto.title,
+      sinopsis: dto.sinopsis,
+      genre: dto.genre,
+      duration: dto.duration,
+      rating: dto.rating,
+      posterUrl: dto.posterUrl,
+      dateRelease: dto.dateReleased,
+    },
+  });
+}
+
 
   findAll() {
-    return this.movies;
+    return this.prisma.movies.findMany();
   }
 
   findOne(id: number) {
-    return this.movies.find((movie) => movie.id === id);
+    return this.prisma.movies.findUnique({ where: { id } });
   }
 
-  update(id: number, updateMovieDto: UpdateMovieDto) {
-    const index = this.movies.findIndex((m) => m.id === id);
-    if (index > -1) {
-      this.movies[index] = { ...this.movies[index], ...updateMovieDto };
-      return this.movies[index];
-    }
-    return null;
+  update(id: number, dto: UpdateMovieDto) {
+    return this.prisma.movies.update({ where: { id }, data: dto });
   }
 
   remove(id: number) {
-    const index = this.movies.findIndex((m) => m.id === id);
-    if (index > -1) {
-      const deleted = this.movies.splice(index, 1);
-      return deleted[0];
-    }
-    return null;
+    return this.prisma.movies.delete({ where: { id } });
   }
 }
